@@ -22,7 +22,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
     username = models.CharField("사용자 계정", max_length=50, unique=True, blank=True)
     password = models.CharField("비밀번호", max_length=128, blank=True)
-    email = models.EmailField("사용자 이메일", max_length=128)
+    email = models.EmailField("사용자 이메일", max_length=128, unique=True, blank=True)
 
     create_date = models.DateTimeField("가입일", auto_now_add=True)
 
