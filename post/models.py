@@ -14,4 +14,11 @@ class Post(models.Model):
     update_date = models.DateTimeField("수저일", auto_now=True)
 
     def __str__(self):
-        return self.name
+        return self.user, self.title
+
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user, self.post
