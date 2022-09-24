@@ -19,5 +19,8 @@ def create_post(create_data : dict[str, str], user : UserModel)-> None:
     post_data_serializer.save()
 
 
-
+def read_post():
+    all_posts = PostModel.objects.all()
+    post_serializer = PostSerializer(all_posts, many = True).data
+    return post_serializer
     
