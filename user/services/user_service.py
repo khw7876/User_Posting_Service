@@ -8,7 +8,6 @@ def create_user(create_data : dict[str,str]) -> None:
             "password: (str): user의 password
         }
     """
-    create_data["point"] = 0
     user_data_serializer = UserSignupSerializer(data=create_data)
     user_data_serializer.is_valid(raise_exception=True)
     user_data_serializer.save()
