@@ -87,5 +87,19 @@ def delete_post(post_id : int)-> None:
     delete_post_obj.is_active = False
     delete_post_obj.save()
     
+def is_author(user : UserModel, post_id : int)-> bool:
+    """
+    로그인 한 유저가 해당 게시글의 작성자인지를 판단하는 함수
 
+    Args:
+        user (UserModel): "현재 로그인이 되어있는 User",
+        post_id (int) : "권한을 체크할 게시글 id"
+
+    Returns:
+        bool: _description_
+    """
+    check_post_obj = PostModel.objects.get(id = post_id)
+    if check_post_obj.user == user:
+        return True
+    return False
 
