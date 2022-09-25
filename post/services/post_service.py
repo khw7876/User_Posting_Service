@@ -71,4 +71,14 @@ def update_post(update_data : dict[str, str], post_id : int)-> None:
     post_data_serializer = PostSerializer(update_post_obj, update_data, partial = True)
     post_data_serializer.is_valid(raise_exception=True)
     post_data_serializer.save()
+
+def delete_post(post_id : int)-> None:
+    """
+    게시글을 삭제(비활)하는 함수
+    Args:
+        post_id (int): "삭제할 게시글의 id"
+    """
+    delete_post_obj = PostModel.objects.get(id=post_id)
+    delete_post_obj.is_active = False
+    delete_post_obj.save()
     
