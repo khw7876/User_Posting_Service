@@ -25,6 +25,7 @@ class PostView(APIView):
         return Response({"detail" : "게시글이 작성되었습니다."}, status=status.HTTP_200_OK)
 
     def put(self, request: Request, post_id: int)-> Response:
-        update_post(request.data, post_id)
+        update_data = get_hashtags_list(request.data)
+        update_post(update_data, post_id)
         return Response({"detail" : "게시글이 수정되었습니다."}, status=status.HTTP_200_OK)
         

@@ -31,7 +31,7 @@ def get_hashtags_list(request_data : dict[str,str]):
 
 def create_post(create_data : dict[str, str], user : UserModel)-> None:
     """
-    게시글을 생성하는 함수, #으로 받은 해시태그를 split, replace로 문자열로 변환
+    게시글을 생성하는 함수
     Args:
         create_data (dict[str, str]): {
             "title" : "게시글의 제목",
@@ -57,8 +57,18 @@ def read_post():
     return post_serializer
     
 def update_post(update_data : dict[str, str], post_id : int)-> None:
+    """
+    게시글을 수정하는 함수
+    Args:
+        update_data (dict[str, str]): {
+            "title" : "게시글의 제목",
+            "content" : "게시글의 내용",
+            "hashtags" : "게시글에 달을 해시태그"
+        }
+        post_id (int): "수정할 게시글의 id"
+    """
     update_post_obj = PostModel.objects.get(id=post_id)
     post_data_serializer = PostSerializer(update_post_obj, update_data, partial = True)
     post_data_serializer.is_valid(raise_exception=True)
     post_data_serializer.save()
-    return 
+    
