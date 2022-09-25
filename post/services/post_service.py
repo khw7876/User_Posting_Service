@@ -1,10 +1,19 @@
-from multiprocessing import managers
 from post.serializers import PostSerializer
 from post.models import HashTags as HashTagsModel, Post as PostModel
 
 from user.models import User as UserModel
 
 def create_post(create_data : dict[str, str], user : UserModel)-> None:
+    """
+    게시글을 생성하는 함수, #으로 받은 해시태그를 split, replace로 문자열로 변환
+    Args:
+        create_data (dict[str, str]): {
+            "title" : "게시글의 제목",
+            "content" : "게시글의 내용",
+            "hashtags" : "게시글에 달을 해시태그"
+        }
+        user (UserModel): 현재 로그인이 되어있는 user object
+    """
     hash_tag_data_list = create_data["hashtags"].replace(",", "").split("#")
     del hash_tag_data_list[0]
     create_data_hash_tag = []
@@ -18,9 +27,16 @@ def create_post(create_data : dict[str, str], user : UserModel)-> None:
     post_data_serializer.is_valid(raise_exception=True)
     post_data_serializer.save()
 
-
 def read_post():
+    """
+
+    Returns:
+        PostSerializer: post모델의 serializer
+    """
     all_posts = PostModel.objects.all()
     post_serializer = PostSerializer(all_posts, many = True).data
     return post_serializer
     
+def update_post(update_data : dict[str, str], post_id : int)-> None:
+
+    return 

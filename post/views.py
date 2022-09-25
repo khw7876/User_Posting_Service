@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 
 from .services.post_service import(
     create_post,
-    read_post
+    read_post,
+    update_post,
 )
 
 # Create your views here.
@@ -19,5 +20,9 @@ class PostView(APIView):
 
     def post(self, request: Request) -> Response:
         create_post(request.data, request.user)
-        return Response()
+        return Response({"detail" : "게시글이 작성되었습니다."}, status=status.HTTP_200_OK)
+
+    def put(self, request: Request, post_id: int)-> Response:
+        update_post(request.data, post_id)
+        return Response({"detail" : "게시글이 수정되었습니다."}, status=status.HTTP_200_OK)
         
