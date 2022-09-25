@@ -7,6 +7,7 @@ from .services.post_service import(
     create_post,
     read_post,
     update_post,
+    delete_post,
     get_hashtags_list
 )
 
@@ -28,4 +29,8 @@ class PostView(APIView):
         update_data = get_hashtags_list(request.data)
         update_post(update_data, post_id)
         return Response({"detail" : "게시글이 수정되었습니다."}, status=status.HTTP_200_OK)
+
+    def delete(slef, request: Request, post_id: int)-> Response:
+        delete_post(post_id)
+        return Response({"detail" : "게시글이 삭제(비활) 되었습니다."}, status=status.HTTP_200_OK)
         
