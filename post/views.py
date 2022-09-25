@@ -1,7 +1,8 @@
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .services.post_service import(
     create_post,
@@ -16,8 +17,11 @@ class PostView(APIView):
     """
     post에 관련된 CRUD를 담당하는 View
     """
-    def get(self, request: Request) -> Response:
-        post_serializer = read_post()
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [JWTAuthentication]
+    
+    def get(self, request: Request, case: str) -> Response:
+        post_serializer = read_post(case)
         return Response(post_serializer, status=status.HTTP_200_OK)
 
     def post(self, request: Request) -> Response:
