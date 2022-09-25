@@ -7,6 +7,7 @@ from .services.post_service import(
     create_post,
     read_post,
     update_post,
+    get_hashtags_list
 )
 
 # Create your views here.
@@ -19,7 +20,8 @@ class PostView(APIView):
         return Response(post_serializer, status=status.HTTP_200_OK)
 
     def post(self, request: Request) -> Response:
-        create_post(request.data, request.user)
+        create_data = get_hashtags_list(request.data)
+        create_post(create_data, request.user)
         return Response({"detail" : "게시글이 작성되었습니다."}, status=status.HTTP_200_OK)
 
     def put(self, request: Request, post_id: int)-> Response:
