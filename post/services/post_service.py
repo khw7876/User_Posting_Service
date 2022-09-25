@@ -46,14 +46,19 @@ def create_post(create_data : dict[str, str], user : UserModel)-> None:
     post_data_serializer.is_valid(raise_exception=True)
     post_data_serializer.save()
 
-def read_post():
+def read_post(case:str):
     """
     게시글 목록을 보여주는 함수
+    Args:
+        case (str): "all, active 둘 중 하나로 모든 게시글, 활성화 게시글 분기"
     Returns:
         PostSerializer: post모델의 serializer
     """
-    all_posts = PostModel.objects.all()
-    post_serializer = PostSerializer(all_posts, many = True).data
+    if case == all:
+        posts_query_set = PostModel.objects.all()
+    else:
+        posts_query_set = PostModel.objects.filter(is_active = True)
+    post_serializer = PostSerializer(posts_query_set, many = True).data
     return post_serializer
     
 def update_post(update_data : dict[str, str], post_id : int)-> None:
@@ -82,3 +87,5 @@ def delete_post(post_id : int)-> None:
     delete_post_obj.is_active = False
     delete_post_obj.save()
     
+
+
