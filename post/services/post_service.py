@@ -102,3 +102,19 @@ def check_is_author(user : UserModel, post_id : int)-> bool:
         return True
     return False
 
+def recover_post(user : UserModel, post_id : int)-> None:
+    """
+    비활성화 되어있는 게시물을 다시 활성화 하는 함수
+    Args:
+        user (UserModel): "현재 로그인이 되어있는 User",
+        post_id (int): "다시 활성화 할 게시글 id"
+    """
+    active_post_obj = PostModel.objects.get(id = post_id)
+    active_post_obj.is_active = True
+    active_post_obj.save()
+
+def check_post_is_active(post_id : int):
+    check_post_obj = PostModel.objects.get(id = post_id)
+    if check_post_obj.is_active:
+        return True
+    return False
