@@ -11,7 +11,8 @@ from .services.post_service import(
     delete_post,
     get_hashtags_list,
     check_is_author,
-    recover_post
+    recover_post,
+    check_post_is_active
 )
 
 # Create your views here.
@@ -52,5 +53,7 @@ class RecoverPostView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def put(slef, request: Request, post_id: int):
+        if check_post_is_active(post_id):
+            return Response({"detail" : "게시글이 활성화가 되어있는 상태입니다."}, status=status.HTTP_400_BAD_REQUEST)
         recover_post(request.user, post_id)
         return Response({"detail" : "게시글이 복구되었습니다."}, status=status.HTTP_200_OK)
