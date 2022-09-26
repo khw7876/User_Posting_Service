@@ -10,7 +10,8 @@ from .services.post_service import(
     update_post,
     delete_post,
     get_hashtags_list,
-    check_is_author
+    check_is_author,
+    recover_post
 )
 
 # Create your views here.
@@ -43,3 +44,13 @@ class PostView(APIView):
             return Response({"detail" : "게시글이 삭제(비활) 되었습니다."}, status=status.HTTP_200_OK)
         return Response({"detail" : "게시글의 삭제는 작성자만이 할 수 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
         
+class RecoverPostView(APIView):
+    """
+    비활성화 된 post를 다시 활성화 시켜주는 View
+    """
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [JWTAuthentication]
+
+    def put(slef, request: Request, post_id: int):
+        recover_post(request.user, post_id)
+        return Response({"detail" : "게시글이 복구되었습니다."}, status=status.HTTP_200_OK)
