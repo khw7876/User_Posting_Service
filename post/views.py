@@ -30,20 +30,20 @@ class PostView(APIView):
     def post(self, request: Request) -> Response:
         create_data = get_hashtags_list(request.data)
         create_post(create_data, request.user)
-        return Response({"detail" : "게시글이 작성되었습니다."}, status=status.HTTP_200_OK)
+        return Response({"detail" : "게시글이 작성되었습니다."}, status=status.HTTP_201_CREATED)
 
     def put(self, request: Request, post_id: int)-> Response:
         if check_is_author(request.user, post_id):
             update_data = get_hashtags_list(request.data)
             update_post(update_data, post_id)
-            return Response({"detail" : "게시글이 수정되었습니다."}, status=status.HTTP_200_OK)
-        return Response({"detail" : "게시글의 수정은 작성자만이 할 수 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail" : "게시글이 수정되었습니다."}, status=status.HTTP_201_CREATED)
+        return Response({"detail" : "게시글의 수정은 작성자만이 할 수 있습니다."}, status=status.HTTP_403_FORBIDDEN)
 
     def delete(slef, request: Request, post_id: int)-> Response:
         if check_is_author(request.user, post_id):
             delete_post(post_id)
             return Response({"detail" : "게시글이 삭제(비활) 되었습니다."}, status=status.HTTP_200_OK)
-        return Response({"detail" : "게시글의 삭제는 작성자만이 할 수 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail" : "게시글의 삭제는 작성자만이 할 수 있습니다."}, status=status.HTTP_403_FORBIDDEN)
         
 class RecoverPostView(APIView):
     """
