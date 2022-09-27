@@ -142,6 +142,17 @@ def like_post(post_id : int, user : UserModel):
     liked_post.delete()
     return False
 
+def get_detail_post(post_id : int):
+    """
+    게시글 상세보기 기능
 
+    Args:
+        post_id (int): "상세보기 할 게시글의 id"
+    """
+    post_obj = PostModel.objects.get(id=post_id)
+    post_serializer = PostSerializer(post_obj).data
+    post_obj.views += 1
+    post_obj.save()
+    return post_serializer
 
 
