@@ -63,7 +63,9 @@ class LikeView(APIView):
     """
     게시글을 좋아요 하는 View
     """
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [JWTAuthentication]
 
     def post(self, request: Request, post_id: int):
-        like_post(post_id)
+        like_post(post_id, request.user)
         return Response({"detail" : "게시글이 좋아요 되었습니다."}, status=status.HTTP_200_OK)

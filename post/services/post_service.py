@@ -128,14 +128,14 @@ def check_post_is_active(post_id : int):
         return True
     return False
 
-def like_post(post_id : int):
+def like_post(post_id : int, user : UserModel):
     """
     게시글을 좋아요 또는 취소하는 기능
 
     Args:
         post_id (int): "좋아요를 할 게시글의 id"
     """
-    liked_board, created = Like.objects.get_or_create(post__id = post_id)
+    liked_board, created = Like.objects.get_or_create(post__id = post_id, user = user)
     if created:
         liked_board.save()
     elif liked_board:
