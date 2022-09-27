@@ -67,5 +67,6 @@ class LikeView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def post(self, request: Request, post_id: int):
-        like_post(post_id, request.user)
-        return Response({"detail" : "게시글이 좋아요 되었습니다."}, status=status.HTTP_200_OK)
+        if like_post(post_id, request.user):
+            return Response({"detail" : "게시글이 좋아요 되었습니다."}, status=status.HTTP_200_OK)
+        return Response({"detail" : "게시글이 좋아요가 취소 되었습니다."}, status=status.HTTP_200_OK)
