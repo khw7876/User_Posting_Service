@@ -8,4 +8,5 @@ urlpatterns = [
     path("<str:case>", views.PostView.as_view(), name="post_id_view"),
     path("<int:post_id>", views.RecoverPostView.as_view(), name="post_recover_view"),
     path("like/<int:post_id>", views.LikeView.as_view(), name="like_view"),
+    path("detail/<int:post_id>", views.DetialPostView.as_view(), name="detail_post_view"),
 ]

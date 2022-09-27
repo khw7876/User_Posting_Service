@@ -150,9 +150,9 @@ def get_detail_post(post_id : int):
         post_id (int): "상세보기 할 게시글의 id"
     """
     post_obj = PostModel.objects.get(id=post_id)
-    post_serializer = PostSerializer(post_obj).data
     post_obj.views += 1
     post_obj.save()
+    post_serializer = PostSerializer(post_obj).data
     return post_serializer
 
 
