@@ -114,6 +114,15 @@ def recover_post(user : UserModel, post_id : int)-> None:
     active_post_obj.save()
 
 def check_post_is_active(post_id : int):
+    """
+    게시글이 현재 활성화 상태인지 체크하는 로직
+    Args:
+        post_id (int): "활성화 여부를 체크할 게시글 id"
+
+    Returns:
+        True : "활성화 상태일 때",
+        False : "비활성화 상태일 때" 
+    """
     check_post_obj = PostModel.objects.get(id = post_id)
     if check_post_obj.is_active:
         return True
