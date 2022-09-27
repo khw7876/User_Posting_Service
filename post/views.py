@@ -12,7 +12,8 @@ from .services.post_service import(
     get_hashtags_list,
     check_is_author,
     recover_post,
-    check_post_is_active
+    check_post_is_active,
+    like_post
 )
 
 # Create your views here.
@@ -57,3 +58,12 @@ class RecoverPostView(APIView):
             return Response({"detail" : "게시글이 활성화가 되어있는 상태입니다."}, status=status.HTTP_400_BAD_REQUEST)
         recover_post(request.user, post_id)
         return Response({"detail" : "게시글이 복구되었습니다."}, status=status.HTTP_200_OK)
+
+class LikeView(APIView):
+    """
+    게시글을 좋아요 하는 View
+    """
+
+    def post(self, request: Request, post_id: int):
+        like_post(post_id)
+        return Response({"detail" : "게시글이 좋아요 되었습니다."}, status=status.HTTP_200_OK)
