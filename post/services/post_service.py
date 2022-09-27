@@ -1,5 +1,5 @@
 from post.serializers import PostSerializer
-from post.models import HashTags as HashTagsModel, Post as PostModel
+from post.models import HashTags as HashTagsModel, Like, Post as PostModel
 
 from user.models import User as UserModel
 
@@ -127,3 +127,16 @@ def check_post_is_active(post_id : int):
     if check_post_obj.is_active:
         return True
     return False
+
+def like_post(post_id : int):
+    """
+    게시글을 좋아요 또는 취소하는 기능
+
+    Args:
+        post_id (int): "좋아요를 할 게시글의 id"
+    """
+    liked_board, created = Like.objects.get_or_create(post__id = post_id)
+    if created:
+        liked_board.save()
+    elif liked_board:
+        liked_board.delete
