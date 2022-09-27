@@ -9,7 +9,6 @@ class HashTags(models.Model):
     def __str__(self):
         return self.tags
 
-
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField("제목", max_length=50)

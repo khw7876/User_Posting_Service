@@ -1,5 +1,5 @@
 from post.serializers import PostSerializer
-from post.models import HashTags as HashTagsModel, Post as PostModel
+from post.models import HashTags as HashTagsModel, Like, Post as PostModel
 
 from user.models import User as UserModel
 
@@ -114,7 +114,29 @@ def recover_post(user : UserModel, post_id : int)-> None:
     active_post_obj.save()
 
 def check_post_is_active(post_id : int):
+    """
+    게시글이 현재 활성화 상태인지 체크하는 로직
+    Args:
+        post_id (int): "활성화 여부를 체크할 게시글 id"
+
+    Returns:
+        True : "활성화 상태일 때",
+        False : "비활성화 상태일 때" 
+    """
     check_post_obj = PostModel.objects.get(id = post_id)
     if check_post_obj.is_active:
         return True
     return False
+
+def like_post(post_id : int, user : UserModel):
+    """
+    게시글을 좋아요 또는 취소하는 기능
+
+    Args:
+        post_id (int): "좋아요를 할 게시글의 id"
+    """
+    liked_board, created = Like.objects.get_or_create(post__id = post_id, user = user)
+    if created:
+        liked_board.save()
+    elif liked_board:
+        liked_board.delete
