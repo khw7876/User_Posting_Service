@@ -13,7 +13,8 @@ from .services.post_service import(
     check_is_author,
     recover_post,
     check_post_is_active,
-    like_post
+    like_post,
+    get_detail_post
 )
 
 # Create your views here.
@@ -67,5 +68,14 @@ class LikeView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def post(self, request: Request, post_id: int):
-        like_post(post_id, request.user)
-        return Response({"detail" : "게시글이 좋아요 되었습니다."}, status=status.HTTP_200_OK)
+        if like_post(post_id, request.user):
+            return Response({"detail" : "게시글이 좋아요 되었습니다."}, status=status.HTTP_200_OK)
+        return Response({"detail" : "게시글이 좋아요가 취소 되었습니다."}, status=status.HTTP_200_OK)
+
+class DetialPostView(APIView):
+    """
+    게시글을 상세보기 하는 Views
+    """
+    def get(self, request: Request, post_id: int):
+        detail_post_serializer = get_detail_post(post_id)
+        return Response(detail_post_serializer, status=status.HTTP_200_OK)

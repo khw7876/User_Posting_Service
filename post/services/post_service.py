@@ -135,8 +135,24 @@ def like_post(post_id : int, user : UserModel):
     Args:
         post_id (int): "좋아요를 할 게시글의 id"
     """
-    liked_board, created = Like.objects.get_or_create(post__id = post_id, user = user)
+    post_obj = PostModel.objects.get(id=post_id)
+    liked_post, created = Like.objects.get_or_create(post = post_obj, user = user)
     if created:
-        liked_board.save()
-    elif liked_board:
-        liked_board.delete
+        return True
+    liked_post.delete()
+    return False
+
+def get_detail_post(post_id : int):
+    """
+    게시글 상세보기 기능
+
+    Args:
+        post_id (int): "상세보기 할 게시글의 id"
+    """
+    post_obj = PostModel.objects.get(id=post_id)
+    post_obj.views += 1
+    post_obj.save()
+    post_serializer = PostSerializer(post_obj).data
+    return post_serializer
+
+
