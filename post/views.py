@@ -25,8 +25,17 @@ class PostView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
 
-    def get(self, request: Request, case: str) -> Response:
-        post_serializer = read_post(case)
+    def get(self, request: Request) -> Response:
+        order_by = self.request.query_params.get("order_by", 'created_at')
+        reverse = int(self.request.query_params.get("reverse", 0))
+        serach = self.request.query_params.get("serach", '')
+        hashtags = self.request.query_params.get("hashtags", '')
+        page = int(self.request.query_params.get("page", 1))
+        page_size = int(self.request.query_params.get("page_size", 10))
+        is_active = int(self.request.query_params.get("is_active", 1))
+        
+        post_serializer = read_post()
+        # post_serializer = read_post(case)
         return Response(post_serializer, status=status.HTTP_200_OK)
 
     def post(self, request: Request) -> Response:
