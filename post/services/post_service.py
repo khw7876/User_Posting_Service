@@ -46,18 +46,61 @@ def create_post(create_data : dict[str, str], user : UserModel)-> None:
     post_data_serializer.is_valid(raise_exception=True)
     post_data_serializer.save()
 
-def read_post(case:str):
+def read_post(params_data : dict[str, str]):
     """
     게시글 목록을 보여주는 함수
     Args:
-        case (str): "all, active 둘 중 하나로 모든 게시글, 활성화 게시글 분기"
+        params_data (dict[str, Union(str,int)]): {
+            "order_by" : 정렬을 하기 위한 값, 들어올 수 있는 값 = {created_at, like, views}, default = created_at
+            "reverse" : 내림차 or 오름차를 결정하는 값, 들어올 수 있는 값 = {0(내림차), 1(오름차)}, default = 0
+            "serach" : 검색할 단어를 결정하는 값,
+            "hashtags" : 검색할 해시태그를 결정하는 값,
+            "page" : 현재 페이지의 위치, 들어올 수 있는 값 = int, default = 1,
+            "page_size" : 페이지당 게시글의 수, 들어올 수 있는 값 = int, default = 10,
+            "is_active" : 게시글의 활성화 여부, 들어올 수 있는 값 = {0(활성화), 1(모든)}, default = 1 
+        }
     Returns:
         PostSerializer: post모델의 serializer
     """
-    if case == all:
-        posts_query_set = PostModel.objects.all()
-    else:
-        posts_query_set = PostModel.objects.filter(is_active = True)
+    if params_data["order_by"] == "created_at":
+        order_by = "create_date"
+    elif params_data["order_by"] == "like":
+        order_by = "like"
+    elif params_data["order_by"] == "views":
+        order_by = "views"
+
+    if params_data["reverse"] == 0:
+        reverse = "-"
+    elif params_data["reverse"] == 1:
+        reverse = ""
+
+    search = params_data["serach"]
+    posts_query_set = PostModel.objects.filter(title__icontains = search).order_by(reverse + order_by) | PostModel.objects.filter(content__icontains = search).order_by(reverse + order_by)
+    
+    hashtags = params_data["hashtags"]
+    hashtags = hashtags.split(",")
+    # list = []
+    # for A in posts_query_set[1].hashtags.all():
+    #     list.append(A.tags)
+    hashtag_list = []
+    for hashtag in hashtags:
+        hashtag_list.append(HashTagsModel.objects.get(tags = hashtag))
+
+    posts_query_set_data = PostModel.objects.none()
+    for a in hashtag_list:
+        posts_query_set_data = posts_query_set_data | posts_query_set.filter(hashtags__tags = a)
+
+    page = params_data["page"]
+    page_size = params_data["page_size"]
+
+    if params_data["is_active"] == 0:
+        posts_query_set = posts_query_set.filter(is_active = True)
+    elif params_data["is_active"] == 1:
+        posts_query_set = posts_query_set.all()
+
+    total_page_size = posts_query_set.count() / page_size
+
+    posts_query_set = posts_query_set[(page-1) * page_size : (page-1) * page_size + page_size]
     post_serializer = PostSerializer(posts_query_set, many = True).data
     return post_serializer
     
