@@ -74,11 +74,11 @@ def read_post_hashtags(posts_query_set : PostModel, hashtags : str):
     """
     해시태그를 통한 필터링을 거치는 함수
     Args:
-        posts_query_set (PostModel): "read_post_search를 거친 PostModel"
+        posts_query_set (PostModel): 검색단어, 내림차, 정렬기준을 거친 PostModel
         hashtags (str): 필터링 할 해시태그들
 
     Returns:
-        _type_: _description_
+        PostModel: 검색단어, 내림차, 정렬기준, 해시태그 필터링을 거친 PostModel
     """
 
     hashtags = hashtags.split(",")
@@ -96,11 +96,11 @@ def read_post_check_is_active(posts_query_set : PostModel, is_active : int):
     """
     게시물을 활성화 된 게시물만 가져올지, 전체를 가져올지 정제하는 함수
     Args:
-        posts_query_set (PostModel): _description_
-        is_active (int): _description_
+        posts_query_set (PostModel): 검색단어, 내림차, 정렬기준, 해시태그 필터링을 거친 PostModel
+        is_active (int): 게시글의 활성화 여부, 들어올 수 있는 값 = {0(활성화), 1(모든)}, default = 1
 
     Returns:
-        _type_: _description_
+        PostModel: 검색단어, 내림차, 정렬기준, 해시태그 필터링, 활성화 여부체크를 거친 PostModel
     """
     if is_active == 0:
         posts_query_set = posts_query_set.filter(is_active = True)
@@ -108,29 +108,15 @@ def read_post_check_is_active(posts_query_set : PostModel, is_active : int):
         posts_query_set = posts_query_set.all()
     return posts_query_set
 
-def read_post(params_data : dict[str, str]):
+def read_post_paginated(posts_query_set : PostModel, page : int, page_size : int):
     """
-    게시글 목록을 보여주는 함수
+    필터링 된 PostModel을 페이지네이션 해주는 함수
     Args:
-        params_data (dict[str, Union(str,int)]): {
-            "hashtags" : 검색할 해시태그를 결정하는 값,
-            "page" : 현재 페이지의 위치, 들어올 수 있는 값 = int, default = 1,
-            "page_size" : 페이지당 게시글의 수, 들어올 수 있는 값 = int, default = 10,
-            "is_active" : 게시글의 활성화 여부, 들어올 수 있는 값 = {0(활성화), 1(모든)}, default = 1 
-        }
+        page (int) : 현재 페이지의 위치, 들어올 수 있는 값 = int, default = 1,
+        page_size (int) : 페이지당 게시글의 수, 들어올 수 있는 값 = int, default = 10,
     Returns:
         PostSerializer: post모델의 serializer
     """
-    
-    page = params_data["page"]
-    page_size = params_data["page_size"]
-
-    if params_data["is_active"] == 0:
-        posts_query_set = posts_query_set.filter(is_active = True)
-    elif params_data["is_active"] == 1:
-        posts_query_set = posts_query_set.all()
-
-    total_page_size = posts_query_set.count() / page_size
 
     posts_query_set = posts_query_set[(page-1) * page_size : (page-1) * page_size + page_size]
     post_serializer = PostSerializer(posts_query_set, many = True).data
