@@ -14,7 +14,9 @@ from .services.post_service import(
     recover_post,
     check_post_is_active,
     like_post,
-    get_detail_post
+    get_detail_post,
+    read_post_search,
+    read_post_hashtags
 )
 
 # Create your views here.
@@ -27,16 +29,18 @@ class PostView(APIView):
 
     def get(self, request: Request) -> Response:
         
+        search = self.request.query_params.get("search", '')
+        reverse = int(self.request.query_params.get("reverse", 0))
+        order_by = self.request.query_params.get("order_by", 'created_at')
+        posts_query_set = read_post_search(search, reverse, order_by)
+
         data_dict = {
-            "order_by" : self.request.query_params.get("order_by", 'created_at'),
-            "reverse" : int(self.request.query_params.get("reverse", 0)),
-            "serach" : self.request.query_params.get("serach", ''),
             "hashtags" : self.request.query_params.get("hashtags", ''),
             "page" : int(self.request.query_params.get("page", 1)),
             "page_size" : int(self.request.query_params.get("page_size", 10)),
             "is_active" : int(self.request.query_params.get("is_active", 1))
         }
-
+        
         post_serializer = read_post(data_dict)
         return Response(post_serializer, status=status.HTTP_200_OK)
 
