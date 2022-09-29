@@ -46,15 +46,16 @@ def create_post(create_data : dict[str, str], user : UserModel)-> None:
     post_data_serializer.is_valid(raise_exception=True)
     post_data_serializer.save()
 
-def read_post_search(search, reverse, order_by):
+def read_post_search(search : str, reverse : int, order_by : str):
     """
+    검색한 단어, 역순, 정렬기준에 맞추어 PostModel을 찾는 함수
     Args:
-        search (_type_): 검색할 단어를 결정하는 값,
-        reverse (_type_): 내림차 or 오름차를 결정하는 값, 들어올 수 있는 값 = {0(내림차), 1(오름차)}, default = 0
-        order_by (_type_): 정렬을 하기 위한 값, 들어올 수 있는 값 = {created_at, like, views}, default = created_at
+        search (str): 검색할 단어를 결정하는 값,
+        reverse (int): 내림차 or 오름차를 결정하는 값, 들어올 수 있는 값 = {0(내림차), 1(오름차)}, default = 0
+        order_by (str): 정렬을 하기 위한 값, 들어올 수 있는 값 = {created_at, like, views}, default = created_at
 
     Returns:
-        _type_: _description_
+        posts_query_set: 검색단어, 내림차, 정렬기준을 거친 PostModel
     """
     if order_by == "created_at":
         order_by = "create_date"
@@ -69,7 +70,16 @@ def read_post_search(search, reverse, order_by):
     PostModel.objects.filter(content__icontains = search).order_by(reverse + order_by))
     return posts_query_set
 
-def read_post_hashtags(posts_query_set, hashtags):
+def read_post_hashtags(posts_query_set : PostModel, hashtags : str):
+    """
+    해시태그를 통한 필터링을 거치는 함수
+    Args:
+        posts_query_set (PostModel): "read_post_search를 거친 PostModel"
+        hashtags (str): 필터링 할 해시태그들
+
+    Returns:
+        _type_: _description_
+    """
 
     hashtags = hashtags.split(",")
 
@@ -82,13 +92,22 @@ def read_post_hashtags(posts_query_set, hashtags):
         posts_query_set_data = posts_query_set_data | posts_query_set.filter(hashtags__tags = a)
     return posts_query_set_data
 
-def read_post_check_is_active(posts_query_set, is_active):
+def read_post_check_is_active(posts_query_set : PostModel, is_active : int):
+    """
+    게시물을 활성화 된 게시물만 가져올지, 전체를 가져올지 정제하는 함수
+    Args:
+        posts_query_set (PostModel): _description_
+        is_active (int): _description_
+
+    Returns:
+        _type_: _description_
+    """
     if is_active == 0:
         posts_query_set = posts_query_set.filter(is_active = True)
     elif is_active == 1:
         posts_query_set = posts_query_set.all()
     return posts_query_set
-    
+
 def read_post(params_data : dict[str, str]):
     """
     게시글 목록을 보여주는 함수
