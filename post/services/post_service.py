@@ -46,42 +46,43 @@ def create_post(create_data : dict[str, str], user : UserModel)-> None:
     post_data_serializer.is_valid(raise_exception=True)
     post_data_serializer.save()
 
-def read_post(params_data : dict[str, str]):
+def read_post_search(search : str, reverse : int, order_by : str):
     """
-    게시글 목록을 보여주는 함수
+    검색한 단어, 역순, 정렬기준에 맞추어 PostModel을 찾는 함수
     Args:
-        params_data (dict[str, Union(str,int)]): {
-            "order_by" : 정렬을 하기 위한 값, 들어올 수 있는 값 = {created_at, like, views}, default = created_at
-            "reverse" : 내림차 or 오름차를 결정하는 값, 들어올 수 있는 값 = {0(내림차), 1(오름차)}, default = 0
-            "serach" : 검색할 단어를 결정하는 값,
-            "hashtags" : 검색할 해시태그를 결정하는 값,
-            "page" : 현재 페이지의 위치, 들어올 수 있는 값 = int, default = 1,
-            "page_size" : 페이지당 게시글의 수, 들어올 수 있는 값 = int, default = 10,
-            "is_active" : 게시글의 활성화 여부, 들어올 수 있는 값 = {0(활성화), 1(모든)}, default = 1 
-        }
-    Returns:
-        PostSerializer: post모델의 serializer
-    """
-    if params_data["order_by"] == "created_at":
-        order_by = "create_date"
-    elif params_data["order_by"] == "like":
-        order_by = "like"
-    elif params_data["order_by"] == "views":
-        order_by = "views"
+        search (str): 검색할 단어를 결정하는 값,
+        reverse (int): 내림차 or 오름차를 결정하는 값, 들어올 수 있는 값 = {0(내림차), 1(오름차)}, default = 0
+        order_by (str): 정렬을 하기 위한 값, 들어올 수 있는 값 = {created_at, like, views}, default = created_at
 
-    if params_data["reverse"] == 0:
+    Returns:
+        posts_query_set: 검색단어, 내림차, 정렬기준을 거친 PostModel
+    """
+    if order_by == "created_at":
+        order_by = "create_date"
+
+    if reverse == 0:
         reverse = "-"
-    elif params_data["reverse"] == 1:
+    elif reverse == 1:
         reverse = ""
 
-    search = params_data["serach"]
-    posts_query_set = PostModel.objects.filter(title__icontains = search).order_by(reverse + order_by) | PostModel.objects.filter(content__icontains = search).order_by(reverse + order_by)
-    
-    hashtags = params_data["hashtags"]
+    posts_query_set = (PostModel.objects.filter(title__icontains = search).order_by(reverse + order_by)
+    | 
+    PostModel.objects.filter(content__icontains = search).order_by(reverse + order_by))
+    return posts_query_set
+
+def read_post_hashtags(posts_query_set : PostModel, hashtags : str):
+    """
+    해시태그를 통한 필터링을 거치는 함수
+    Args:
+        posts_query_set (PostModel): 검색단어, 내림차, 정렬기준을 거친 PostModel
+        hashtags (str): 필터링 할 해시태그들
+
+    Returns:
+        PostModel: 검색단어, 내림차, 정렬기준, 해시태그 필터링을 거친 PostModel
+    """
+
     hashtags = hashtags.split(",")
-    # list = []
-    # for A in posts_query_set[1].hashtags.all():
-    #     list.append(A.tags)
+
     hashtag_list = []
     for hashtag in hashtags:
         hashtag_list.append(HashTagsModel.objects.get(tags = hashtag))
@@ -89,16 +90,33 @@ def read_post(params_data : dict[str, str]):
     posts_query_set_data = PostModel.objects.none()
     for a in hashtag_list:
         posts_query_set_data = posts_query_set_data | posts_query_set.filter(hashtags__tags = a)
+    return posts_query_set_data
 
-    page = params_data["page"]
-    page_size = params_data["page_size"]
+def read_post_check_is_active(posts_query_set : PostModel, is_active : int):
+    """
+    게시물을 활성화 된 게시물만 가져올지, 전체를 가져올지 정제하는 함수
+    Args:
+        posts_query_set (PostModel): 검색단어, 내림차, 정렬기준, 해시태그 필터링을 거친 PostModel
+        is_active (int): 게시글의 활성화 여부, 들어올 수 있는 값 = {0(활성화), 1(모든)}, default = 1
 
-    if params_data["is_active"] == 0:
+    Returns:
+        PostModel: 검색단어, 내림차, 정렬기준, 해시태그 필터링, 활성화 여부체크를 거친 PostModel
+    """
+    if is_active == 0:
         posts_query_set = posts_query_set.filter(is_active = True)
-    elif params_data["is_active"] == 1:
+    elif is_active == 1:
         posts_query_set = posts_query_set.all()
+    return posts_query_set
 
-    total_page_size = posts_query_set.count() / page_size
+def read_post_paginated(posts_query_set : PostModel, page : int, page_size : int):
+    """
+    필터링 된 PostModel을 페이지네이션 해주는 함수
+    Args:
+        page (int) : 현재 페이지의 위치, 들어올 수 있는 값 = int, default = 1,
+        page_size (int) : 페이지당 게시글의 수, 들어올 수 있는 값 = int, default = 10,
+    Returns:
+        PostSerializer: post모델의 serializer
+    """
 
     posts_query_set = posts_query_set[(page-1) * page_size : (page-1) * page_size + page_size]
     post_serializer = PostSerializer(posts_query_set, many = True).data
