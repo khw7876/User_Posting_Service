@@ -80,9 +80,15 @@ def read_post_hashtags(posts_query_set, hashtags):
     posts_query_set_data = PostModel.objects.none()
     for a in hashtag_list:
         posts_query_set_data = posts_query_set_data | posts_query_set.filter(hashtags__tags = a)
+    return posts_query_set_data
 
-
-
+def read_post_check_is_active(posts_query_set, is_active):
+    if is_active == 0:
+        posts_query_set = posts_query_set.filter(is_active = True)
+    elif is_active == 1:
+        posts_query_set = posts_query_set.all()
+    return posts_query_set
+    
 def read_post(params_data : dict[str, str]):
     """
     게시글 목록을 보여주는 함수
@@ -96,8 +102,6 @@ def read_post(params_data : dict[str, str]):
     Returns:
         PostSerializer: post모델의 serializer
     """
-    
-    
     
     page = params_data["page"]
     page_size = params_data["page_size"]
