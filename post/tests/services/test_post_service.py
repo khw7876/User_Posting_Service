@@ -1,6 +1,10 @@
 from django.test import TestCase
+from post.models import Post as PostModel, HashTags as HashTagsModel
 
 from user.models import User as UserModel
+from post.services.post_service import(
+    get_hashtags_list,
+)
 
 class TestPostService(TestCase):
     """
@@ -10,3 +14,12 @@ class TestPostService(TestCase):
     @classmethod
     def setUpClassData(cls):
         user = UserModel.objects.create(username="ko", nickname="ko")
+        hashtags = HashTagsModel.objects.create(tags = "해시태그")
+        post = PostModel.objects.create(user = user, title = "게시글 제목", content = "게시글 내용", hashtags = hashtags)
+
+    def test_when_success_get_hashtags_list(self)-> None:
+        """
+        "#"과 ","이 들어있는 해시태그를 사용할 수 있는 형태로 변환해주는 함수에 대한 검증
+        case : 성공적으로 분리가 되었을 경우
+        """
+
