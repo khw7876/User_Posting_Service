@@ -22,4 +22,15 @@ class TestPostService(TestCase):
         "#"과 ","이 들어있는 해시태그를 사용할 수 있는 형태로 변환해주는 함수에 대한 검증
         case : 성공적으로 분리가 되었을 경우
         """
+        request_data = {"hashtags" : "#태그1,#태그2"}
+        hash_tag_data = {}
+        hash_tag_data_list = request_data["hashtags"].replace(",", "").split("#")
+        del hash_tag_data_list[0]
+        request_data_hash_tag = []
+        for hash_tag in hash_tag_data_list:
+            HashTagsModel.objects.get_or_create(tags = hash_tag)
+            request_data_hash_tag.append(HashTagsModel.objects.get(tags = hash_tag).id)
+        hash_tag_data["hashtags"] = request_data_hash_tag
+
+        self.assertEqual(hash_tag_data, get_hashtags_list(request_data))
 
