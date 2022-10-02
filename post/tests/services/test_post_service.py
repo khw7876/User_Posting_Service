@@ -1,6 +1,7 @@
 from django.test import TestCase
-from post.models import Post as PostModel, HashTags as HashTagsModel
+from rest_framework import exceptions
 
+from post.models import Post as PostModel, HashTags as HashTagsModel
 from user.models import User as UserModel
 from post.services.post_service import(
     get_hashtags_list,
@@ -85,3 +86,21 @@ class TestPostService(TestCase):
         count2 = PostModel.objects.all().count()
         
         self.assertEqual(count1 + 1, count2)
+    
+    def test_when_None_tite_in_create_post(self):
+        """
+        게시글을 생성하는 함수에 대한 검증
+        case : title에 비어있는 값을 넣었을 경우
+        result : validation을 통과하지 못하고 error 반환
+        """
+        user = UserModel.objects.get(username="ko", email="ko@naver.com")
+        tags_tags = HashTagsModel.objects.get(tags = "해시태그")
+
+        request_data = {
+            "title" : "",
+            "content" : "게시글 내용", 
+            "hashtags" : [tags_tags.id]}
+        
+        with self.assertRaises(exceptions.ValidationError):
+            create_post(request_data, user)
+
