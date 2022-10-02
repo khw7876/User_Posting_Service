@@ -35,7 +35,7 @@ class PostView(APIView):
         order_by = self.request.query_params.get("order_by", 'created_at')
         posts_query_set = read_post_search(search, reverse, order_by)
 
-        hashtags = self.request.query_params.get("hashtags", ''),
+        hashtags = self.request.query_params.get("hashtags", '')
         posts_query_set = read_post_hashtags(posts_query_set, hashtags)
 
         is_active = int(self.request.query_params.get("is_active", 1))
