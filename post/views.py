@@ -1,4 +1,4 @@
-from rest_framework import status, permissions
+from rest_framework import status, permissions, exceptions
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -35,7 +35,7 @@ class PostView(APIView):
         order_by = self.request.query_params.get("order_by", 'created_at')
         posts_query_set = read_post_search(search, reverse, order_by)
 
-        hashtags = self.request.query_params.get("hashtags", ''),
+        hashtags = self.request.query_params.get("hashtags", '')
         posts_query_set = read_post_hashtags(posts_query_set, hashtags)
 
         is_active = int(self.request.query_params.get("is_active", 1))
@@ -48,9 +48,13 @@ class PostView(APIView):
         return Response(post_serializer, status=status.HTTP_200_OK)
 
     def post(self, request: Request) -> Response:
-        create_data = get_hashtags_list(request.data)
-        create_post(create_data, request.user)
-        return Response({"detail" : "게시글이 작성되었습니다."}, status=status.HTTP_201_CREATED)
+        try:
+            create_data = get_hashtags_list(request.data)
+            create_post(create_data, request.user)
+            return Response({"detail" : "게시글이 작성되었습니다."}, status=status.HTTP_201_CREATED)
+        except exceptions.ValidationError as e:
+                error_message = "".join([str(value) for values in e.detail.values() for value in values])
+                return Response({"detail": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request: Request, post_id: int)-> Response:
         if check_is_author(request.user, post_id):
