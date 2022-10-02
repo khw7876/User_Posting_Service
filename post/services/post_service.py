@@ -66,7 +66,7 @@ def read_post_search(search : str, reverse : int, order_by : str):
         reverse = ""
 
     posts_query_set = (PostModel.objects.filter(title__icontains = search).order_by(reverse + order_by)
-    | 
+    |
     PostModel.objects.filter(content__icontains = search).order_by(reverse + order_by))
     return posts_query_set
 
@@ -87,10 +87,9 @@ def read_post_hashtags(posts_query_set : PostModel, hashtags : str):
     for hashtag in hashtags:
         hashtag_list.append(HashTagsModel.objects.get(tags = hashtag))
 
-    posts_query_set_data = PostModel.objects.none()
     for a in hashtag_list:
-        posts_query_set_data = posts_query_set_data | posts_query_set.filter(hashtags__tags = a)
-    return posts_query_set_data
+        posts_query_set = posts_query_set.filter(hashtags__tags = a)
+    return posts_query_set
 
 def read_post_check_is_active(posts_query_set : PostModel, is_active : int):
     """
