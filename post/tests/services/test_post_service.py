@@ -87,11 +87,11 @@ class TestPostService(TestCase):
         
         self.assertEqual(count1 + 1, count2)
     
-    def test_when_None_tite_in_create_post(self):
+    def test_when_None_title_in_create_post(self):
         """
         게시글을 생성하는 함수에 대한 검증
         case : title에 비어있는 값을 넣었을 경우
-        result : validation을 통과하지 못하고 error 반환
+        result : validation을 통과하지 못하고 ValidationError 반환
         """
         user = UserModel.objects.get(username="ko", email="ko@naver.com")
         tags_tags = HashTagsModel.objects.get(tags = "해시태그")
@@ -104,3 +104,42 @@ class TestPostService(TestCase):
         with self.assertRaises(exceptions.ValidationError):
             create_post(request_data, user)
 
+    def test_when_None_content_in_create_post(self):
+        """
+        게시글을 생성하는 함수에 대한 검증
+        case : content에 비어있는 값을 넣었을 경우
+        result : validation을 통과하지 못하고 ValidationError 반환
+        """
+        user = UserModel.objects.get(username="ko", email="ko@naver.com")
+        tags_tags = HashTagsModel.objects.get(tags = "해시태그")
+
+        request_data = {
+            "title" : "게시글 제목",
+            "content" : "", 
+            "hashtags" : [tags_tags.id]}
+        
+        with self.assertRaises(exceptions.ValidationError):
+            create_post(request_data, user)
+
+    def test_when_None_content_in_create_post(self):
+        """
+        게시글을 생성하는 함수에 대한 검증
+        case : content에 비어있는 값을 넣었을 경우
+        result : validation을 통과하지 못하고 ValidationError 반환
+        """
+        user = UserModel.objects.get(username="ko", email="ko@naver.com")
+        tags_tags = HashTagsModel.objects.get(tags = "해시태그")
+
+        request_data = {
+            "title" : "게시글 제목",
+            "content" : "", 
+            "hashtags" : [tags_tags.id]}
+        
+        with self.assertRaises(exceptions.ValidationError):
+            create_post(request_data, user)
+
+
+
+
+
+            
