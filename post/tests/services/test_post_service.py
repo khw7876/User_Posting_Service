@@ -6,6 +6,7 @@ from user.models import User as UserModel
 from post.services.post_service import(
     get_hashtags_list,
     create_post,
+    read_post_search,
 )
 
 class TestPostService(TestCase):
@@ -138,8 +139,16 @@ class TestPostService(TestCase):
         with self.assertRaises(exceptions.ValidationError):
             create_post(request_data, user)
 
+    def test_when_success_read_post_search(self):
+        user = UserModel.objects.get(username="ko", email="ko@naver.com")
+        search_1 = PostModel.objects.create(title = "검색1", content = "검색1", user = user)
+        search_2 = PostModel.objects.create(title = "검색2", content = "검색2", user = user)
+        read_post_search("검색", 0, "created_at")
+        self.assertEqual(2, read_post_search("검색", 0, "created_at").count())
 
 
 
 
-            
+
+
+
