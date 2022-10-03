@@ -69,7 +69,7 @@ def read_post_order_by(posts_query_set : PostModel, reverse : int, order_by : st
     정렬기준에 맞추어 PostModel을 정렬하는 함수
     Args:
         reverse (int): 내림차 or 오름차를 결정하는 값, 들어올 수 있는 값 = {0(내림차), 1(오름차)}, default = 0
-        order_by (str): 정렬을 하기 위한 값, 들어올 수 있는 값 = {created_at, like, views}, default = created_at
+        order_by (str): 정렬을 하기 위한 값, 들어올 수 있는 값 = {create_date, like, views}, default = created_at
 
     Returns:
         posts_query_set: 검색단어, 내림차, 정렬기준을 거친 PostModel
@@ -79,10 +79,12 @@ def read_post_order_by(posts_query_set : PostModel, reverse : int, order_by : st
     elif reverse == 1:
         reverse = ""
 
-    if (order_by == "created_at") or (order_by == "views"):
+    if (order_by == "create_date") or (order_by == "views"):
         posts_query_set = posts_query_set.order_by(reverse + order_by)
     elif order_by == "like":
         posts_query_set = posts_query_set.annotate(like_count = Count("like")).order_by('-like_count')
+    else:
+        posts_query_set = posts_query_set.order_by("-create_date")
     return posts_query_set
 
 

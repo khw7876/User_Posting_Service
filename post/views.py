@@ -35,7 +35,7 @@ class PostView(APIView):
         posts_query_set = read_post_search(search)
 
         reverse = int(self.request.query_params.get("reverse", 0))
-        order_by = self.request.query_params.get("order_by", 'created_at')
+        order_by = self.request.query_params.get("order_by", 'create_date')
         posts_query_set = read_post_order_by(posts_query_set, reverse, order_by)
 
         hashtags = self.request.query_params.get("hashtags", '')
