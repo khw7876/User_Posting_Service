@@ -16,6 +16,7 @@ from .services.post_service import(
     like_post,
     get_detail_post,
     read_post_search,
+    read_post_order_by,
     read_post_hashtags,
     read_post_check_is_active
 )
@@ -31,9 +32,11 @@ class PostView(APIView):
     def get(self, request: Request) -> Response:
         
         search = self.request.query_params.get("search", '')
+        posts_query_set = read_post_search(search)
+
         reverse = int(self.request.query_params.get("reverse", 0))
         order_by = self.request.query_params.get("order_by", 'created_at')
-        posts_query_set = read_post_search(search, reverse, order_by)
+        posts_query_set = read_post_order_by(posts_query_set, reverse, order_by)
 
         hashtags = self.request.query_params.get("hashtags", '')
         posts_query_set = read_post_hashtags(posts_query_set, hashtags)
