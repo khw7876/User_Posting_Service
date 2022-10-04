@@ -82,7 +82,7 @@ def read_post_order_by(posts_query_set : PostModel, reverse : int, order_by : st
     if (order_by == "create_date") or (order_by == "views"):
         posts_query_set = posts_query_set.order_by(reverse + order_by)
     elif order_by == "like":
-        posts_query_set = posts_query_set.annotate(like_count = Count("like")).order_by('-like_count')
+        posts_query_set = posts_query_set.annotate(like_count = Count("like")).order_by(reverse + 'like_count')
     else:
         posts_query_set = posts_query_set.order_by("-create_date")
     return posts_query_set
