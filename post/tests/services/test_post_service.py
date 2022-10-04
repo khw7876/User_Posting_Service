@@ -7,6 +7,8 @@ from post.services.post_service import(
     get_hashtags_list,
     create_post,
     read_post_search,
+    read_post_order_by,
+    update_post,
 )
 
 class TestPostService(TestCase):
@@ -140,15 +142,37 @@ class TestPostService(TestCase):
             create_post(request_data, user)
 
     def test_when_success_read_post_search(self):
+        """
+        게시글을 제목, 내용에 포함된 단어로 검색을 하는 함수 검증
+        case : 검색이라는 단어가 포함된 게시글 2개 생성, 검색
+        result : 검색이라는 단어가 포함된 게시글 2개 검색됨
+        """
         user = UserModel.objects.get(username="ko", email="ko@naver.com")
-        search_1 = PostModel.objects.create(title = "검색1", content = "검색1", user = user)
-        search_2 = PostModel.objects.create(title = "검색2", content = "검색2", user = user)
-        read_post_search("검색", 0, "created_at")
-        self.assertEqual(2, read_post_search("검색", 0, "created_at").count())
+        PostModel.objects.create(title = "검색1", content = "검색1", user = user)
+        PostModel.objects.create(title = "검색2", content = "검색2", user = user)
+        read_post_search("검색")
+        self.assertEqual(2, read_post_search("검색").count())
+
+    def test_when_getted_wrong_order_by_in_read_post_order_by(self):
+        read_post_order_by(PostModel.objects.all(), reverse = 1, order_by="zzz")
+
+    def test_when_success_update_post(self):
+        """
+        게시글을 수정하는 함수에 대한 검증
+        case : 정상적으로 게시물이 수정이 되었을 경우
+        result : 게시글이 수정이 되었음
+        """
+        
+        update_post_obj = PostModel.objects.get(title = "게시글 제목", content = "게시글 내용")
+
+        update_data = {
+            "title" : "게시글 제목",
+            "content" : "게시글 내용"}
+
+        update_post(update_data, update_post_obj.id)
+        self.assertEqual(update_post_obj.title, update_data["title"])
 
 
-
-
-
+ 
 
 
