@@ -213,7 +213,7 @@ class TestPostService(TestCase):
         after_delete_post_obj = PostModel.objects.get(title = "게시글 제목")
         self.assertEqual(after_delete_post_obj.is_active, False)
 
-    def test_when_does_not_exist_post_in_update_post(self):
+    def test_when_does_not_exist_post_in_delete_post(self):
         """
         게시글을 비활성화 하는 함수에 대한 검증
         case : 비활성화 하려는 게시글이 존재하지 않을 경우
