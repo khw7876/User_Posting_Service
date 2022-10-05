@@ -9,7 +9,10 @@ from post.services.post_service import(
     read_post_search,
     read_post_order_by,
     update_post,
+    delete_post,
 )
+
+DOES_NOT_EXIST_NUM = 0
 
 class TestPostService(TestCase):
     """
@@ -22,6 +25,7 @@ class TestPostService(TestCase):
         hashtags = HashTagsModel.objects.create(tags = "해시태그")
         post = PostModel.objects.create(user = user, title = "게시글 제목", content = "게시글 내용")
         post.hashtags_tags = hashtags
+
     def test_when_success_get_hashtags_list(self)-> None:
         """
         "#"과 ","이 들어있는 해시태그를 사용할 수 있는 형태로 변환해주는 함수에 대한 검증
@@ -124,23 +128,6 @@ class TestPostService(TestCase):
         with self.assertRaises(exceptions.ValidationError):
             create_post(request_data, user)
 
-    def test_when_None_content_in_create_post(self):
-        """
-        게시글을 생성하는 함수에 대한 검증
-        case : content에 비어있는 값을 넣었을 경우
-        result : validation을 통과하지 못하고 ValidationError 반환
-        """
-        user = UserModel.objects.get(username="ko", email="ko@naver.com")
-        tags_tags = HashTagsModel.objects.get(tags = "해시태그")
-
-        request_data = {
-            "title" : "게시글 제목",
-            "content" : "", 
-            "hashtags" : [tags_tags.id]}
-        
-        with self.assertRaises(exceptions.ValidationError):
-            create_post(request_data, user)
-
     def test_when_success_read_post_search(self):
         """
         게시글을 제목, 내용에 포함된 단어로 검색을 하는 함수 검증
@@ -172,7 +159,66 @@ class TestPostService(TestCase):
         update_post(update_data, update_post_obj.id)
         self.assertEqual(update_post_obj.title, update_data["title"])
 
+    def test_when_does_not_exist_post_in_update_post(self):
+        """
+        게시글을 수정하는 함수에 대한 검증
+        case : 수정하려는 게시글이 존재하지 않을 경우
+        result : Does_not_exist Error 발생
+        """
+        update_data = {
+            "title" : "게시글 제목",
+            "content" : "게시글 내용"}
 
- 
+        with self.assertRaises(PostModel.DoesNotExist):
+            update_post(update_data, DOES_NOT_EXIST_NUM)
 
+    def test_when_title_or_content_under_4length_in_update_post(self):
+        """
+        게시글을 수정하는 함수에 대한 검증
+        case : title에 4글자 이하로 데이터를 넣었을 경우
+        result : Serializer의 validateion을 통과하지 못하고 Validation 에러 발생
+        """
+        update_post_obj = PostModel.objects.get(title = "게시글 제목", content = "게시글 내용")
+
+        update_data = {
+            "title" : "에러",
+            "content" : "게시글 내용"}
+
+        with self.assertRaises(exceptions.ValidationError):
+            update_post(update_data, update_post_obj.id)
+
+    def test_when_None_title_or_content_in_update_post(self):
+        """
+        게시글을 수정하는 함수에 대한 검증
+        case : 필수적인 요소인 title이나 content가 들어가지 않았을 경우
+        result : Serializer의 validateion을 통과하지 못하고 Validation 에러 발생
+        """
+        update_post_obj = PostModel.objects.get(title = "게시글 제목", content = "게시글 내용")
+
+        update_data = {
+            "content" : "게시글 내용"}
+
+        with self.assertRaises(exceptions.ValidationError):
+            update_post(update_data, update_post_obj.id)
+
+    def test_when_success_in_delete_post(self):
+        """
+        게시글을 비활성화 하는 함수에 대한 검증
+        case : 성공적으로 is_active가 False가 된 경우
+        result : 가져온 object의 is_active가 False로 변경
+        """
+        delete_post_obj = PostModel.objects.get(title = "게시글 제목")
+
+        delete_post(delete_post_obj.id)
+        after_delete_post_obj = PostModel.objects.get(title = "게시글 제목")
+        self.assertEqual(after_delete_post_obj.is_active, False)
+
+    def test_when_does_not_exist_post_in_delete_post(self):
+        """
+        게시글을 비활성화 하는 함수에 대한 검증
+        case : 비활성화 하려는 게시글이 존재하지 않을 경우
+        result : Does_not_exist Error 발생
+        """
+        with self.assertRaises(PostModel.DoesNotExist):
+            delete_post(DOES_NOT_EXIST_NUM)
 
