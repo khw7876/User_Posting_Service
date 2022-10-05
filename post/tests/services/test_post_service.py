@@ -186,3 +186,32 @@ class TestPostService(TestCase):
 
         with self.assertRaises(PostModel.DoesNotExist):
             update_post(update_data, DOES_NOT_EXIST_NUM)
+
+    def test_when_title_or_content_under_4length_in_update_post(self):
+        """
+        게시글을 수정하는 함수에 대한 검증
+        case : title에 4글자 이하로 데이터를 넣었을 경우
+        result : Serializer의 validateion을 통과하지 못하고 Validation 에러 발생
+        """
+        update_post_obj = PostModel.objects.get(title = "게시글 제목", content = "게시글 내용")
+
+        update_data = {
+            "title" : "에러",
+            "content" : "게시글 내용"}
+
+        with self.assertRaises(exceptions.ValidationError):
+            update_post(update_data, update_post_obj.id)
+
+    def test_when_None_title_or_content_in_update_post(self):
+        """
+        게시글을 수정하는 함수에 대한 검증
+        case : 필수적인 요소인 title이나 content가 들어가지 않았을 경우
+        result : Serializer의 validateion을 통과하지 못하고 Validation 에러 발생
+        """
+        update_post_obj = PostModel.objects.get(title = "게시글 제목", content = "게시글 내용")
+
+        update_data = {
+            "content" : "게시글 내용"}
+
+        with self.assertRaises(exceptions.ValidationError):
+            update_post(update_data, update_post_obj.id)
