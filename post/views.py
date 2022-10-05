@@ -72,8 +72,11 @@ class PostView(APIView):
 
     def delete(slef, request: Request, post_id: int)-> Response:
         if check_is_author(request.user, post_id):
-            delete_post(post_id)
-            return Response({"detail" : "게시글이 삭제(비활) 되었습니다."}, status=status.HTTP_200_OK)
+            try:
+                delete_post(post_id)
+                return Response({"detail" : "게시글이 삭제(비활) 되었습니다."}, status=status.HTTP_200_OK)
+            except PostModel.DoesNotExist:
+                return Response({"detail" : "삭제하려는 게시글이 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
         return Response({"detail" : "게시글의 삭제는 작성자만이 할 수 있습니다."}, status=status.HTTP_403_FORBIDDEN)
         
 class RecoverPostView(APIView):
