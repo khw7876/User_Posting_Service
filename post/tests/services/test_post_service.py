@@ -11,6 +11,8 @@ from post.services.post_service import(
     update_post,
 )
 
+DOES_NOT_EXIST_NUM = 0
+
 class TestPostService(TestCase):
     """
     Post의 서비스 함수들을 검증하는 클래스
@@ -172,7 +174,15 @@ class TestPostService(TestCase):
         update_post(update_data, update_post_obj.id)
         self.assertEqual(update_post_obj.title, update_data["title"])
 
+    def test_when_does_not_exist_post_in_update_post(self):
+        """
+        게시글을 수정하는 함수에 대한 검증
+        case : 수정하려는 게시글이 존재하지 않을 경우
+        result : 404에러 Does_not_exist Error 발생
+        """
+        update_data = {
+            "title" : "게시글 제목",
+            "content" : "게시글 내용"}
 
- 
-
-
+        with self.assertRaises(PostModel.DoesNotExist):
+            update_post(update_data, DOES_NOT_EXIST_NUM)

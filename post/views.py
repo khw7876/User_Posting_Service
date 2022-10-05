@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from .models import Post as PostModel
 from .services.post_service import(
     create_post,
     read_post_paginated,
@@ -61,9 +62,12 @@ class PostView(APIView):
 
     def put(self, request: Request, post_id: int)-> Response:
         if check_is_author(request.user, post_id):
-            update_data = get_hashtags_list(request.data)
-            update_post(update_data, post_id)
-            return Response({"detail" : "게시글이 수정되었습니다."}, status=status.HTTP_201_CREATED)
+            try:
+                update_data = get_hashtags_list(request.data)
+                update_post(update_data, post_id)
+                return Response({"detail" : "게시글이 수정되었습니다."}, status=status.HTTP_201_CREATED)
+            except PostModel.DoesNotExist:
+                return Response({"detail" : "수정할 게시글이 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
         return Response({"detail" : "게시글의 수정은 작성자만이 할 수 있습니다."}, status=status.HTTP_403_FORBIDDEN)
 
     def delete(slef, request: Request, post_id: int)-> Response:
