@@ -4,9 +4,9 @@ from .models import HashTags as HashTagsModel, Like, Post as PostModel
 class PostSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
-        if len(data["title"]) < 4:
+        if len(data.get("title", "")) < 4:
             raise serializers.ValidationError("제목은 4글자 이상 입력해주세요.")
-        elif len(data["content"]) < 4:
+        elif len(data.get("content", "")) < 4:
             raise serializers.ValidationError("내용은 4글자 이상 입력해주세요.")
         return data
 
