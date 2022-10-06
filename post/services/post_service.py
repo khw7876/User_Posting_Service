@@ -180,7 +180,7 @@ def check_is_author(user : UserModel, post_id : int)-> bool:
         return True
     return False
 
-def recover_post(user : UserModel, post_id : int)-> None:
+def recover_post(post_id : int)-> None:
     """
     비활성화 되어있는 게시물을 다시 활성화 하는 함수
     Args:

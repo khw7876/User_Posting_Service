@@ -89,8 +89,11 @@ class RecoverPostView(APIView):
     def put(slef, request: Request, post_id: int):
         if check_post_is_active(post_id):
             return Response({"detail" : "게시글이 활성화가 되어있는 상태입니다."}, status=status.HTTP_400_BAD_REQUEST)
-        recover_post(request.user, post_id)
-        return Response({"detail" : "게시글이 복구되었습니다."}, status=status.HTTP_200_OK)
+        try: 
+            recover_post(post_id)
+            return Response({"detail" : "게시글이 복구되었습니다."}, status=status.HTTP_200_OK)
+        except PostModel.DoesNotExist:
+            return Response({"detail" : "활성화 하려는 게시글이 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
 
 class LikeView(APIView):
     """
