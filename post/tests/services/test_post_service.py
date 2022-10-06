@@ -226,7 +226,7 @@ class TestPostService(TestCase):
     def test_when_success_recover_post(self):
         """
         비활성화 되어있는 게시물을 다시 활성화 하는 함수
-        case : 비활성화 하려는 게시물이 다시 활성화가 되었을 경우
+        case : 재활성화 하려는 게시물이 다시 활성화가 되었을 경우
         result : 가져온 object의 is_active가 True로 변경
         """
         recover_post_obj = PostModel.objects.get(title = "게시글 제목")
@@ -234,3 +234,13 @@ class TestPostService(TestCase):
         delete_post(recover_post_obj.id)
         after_recover_post_obj = PostModel.objects.get(title = "게시글 제목")
         self.assertEqual(after_recover_post_obj.is_active, True)
+
+    def test_when_does_not_exist_post_in_recover_post(self):
+        """
+        비활성화 되어있는 게시물을 다시 활성화 하는 함수
+        case : 재활성화 하려는 게시글이 존재하지 않을 경우
+        result : Does_not_exist Error 발생
+        """
+
+        with self.assertRaises(PostModel.DoesNotExist):
+            delete_post(DOES_NOT_EXIST_NUM)
