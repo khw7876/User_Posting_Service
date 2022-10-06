@@ -1,0 +1,28 @@
+version: '3.9'
+services:
+
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/django/static
+    ports:
+      - 80:80
+    depends_on:
+      - app
+### 이하 app 컨테이너는 생략###
+  app:
+    build: .
+    volumes:
+      - .:/django
+    ports:
+      - 8000:8000
+    image: app:django
+    container_name: django_container
+    env_file:
+      - ./.env
+      # env 파일 지정 필요
+    command: gunicorn posting_service.wsgi:application --bind 0.0.0.0:8000
+    expose:
+      - 8000
+volumes:
+  static_volume:
