@@ -10,6 +10,7 @@ from post.services.post_service import(
     read_post_order_by,
     update_post,
     delete_post,
+    recover_post,
 )
 
 DOES_NOT_EXIST_NUM = 0
@@ -222,3 +223,14 @@ class TestPostService(TestCase):
         with self.assertRaises(PostModel.DoesNotExist):
             delete_post(DOES_NOT_EXIST_NUM)
 
+    def test_when_success_recover_post(self):
+        """
+        비활성화 되어있는 게시물을 다시 활성화 하는 함수
+        case : 비활성화 하려는 게시물이 다시 활성화가 되었을 경우
+        result : 가져온 object의 is_active가 True로 변경
+        """
+        recover_post_obj = PostModel.objects.get(title = "게시글 제목")
+
+        delete_post(recover_post_obj.id)
+        after_recover_post_obj = PostModel.objects.get(title = "게시글 제목")
+        self.assertEqual(after_recover_post_obj.is_active, True)
