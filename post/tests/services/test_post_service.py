@@ -231,7 +231,7 @@ class TestPostService(TestCase):
         """
         recover_post_obj = PostModel.objects.get(title = "게시글 제목")
 
-        delete_post(recover_post_obj.id)
+        recover_post(recover_post_obj.id)
         after_recover_post_obj = PostModel.objects.get(title = "게시글 제목")
         self.assertEqual(after_recover_post_obj.is_active, True)
 
@@ -243,4 +243,8 @@ class TestPostService(TestCase):
         """
 
         with self.assertRaises(PostModel.DoesNotExist):
-            delete_post(DOES_NOT_EXIST_NUM)
+            recover_post(DOES_NOT_EXIST_NUM)
+
+
+
+
