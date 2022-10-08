@@ -11,6 +11,7 @@ from post.services.post_service import(
     update_post,
     delete_post,
     recover_post,
+    check_is_author
 )
 
 DOES_NOT_EXIST_NUM = 0
@@ -231,7 +232,7 @@ class TestPostService(TestCase):
         """
         recover_post_obj = PostModel.objects.get(title = "게시글 제목")
 
-        delete_post(recover_post_obj.id)
+        recover_post(recover_post_obj.id)
         after_recover_post_obj = PostModel.objects.get(title = "게시글 제목")
         self.assertEqual(after_recover_post_obj.is_active, True)
 
@@ -243,4 +244,27 @@ class TestPostService(TestCase):
         """
 
         with self.assertRaises(PostModel.DoesNotExist):
-            delete_post(DOES_NOT_EXIST_NUM)
+            recover_post(DOES_NOT_EXIST_NUM)
+
+    def test_when_success_in_check_is_author(self):
+        """
+        로그인 한 유저가 해당 게시글의 작성자인지를 판단하는 함수
+        case : 로그인 한 유저가 게시글의 작성자와 일치할 경우
+        result : 일치하다는 뜻으로 True 출력
+        """
+        user = UserModel.objects.get(username="ko", email="ko@naver.com")
+        user_post = PostModel.objects.get(user = user, title = "게시글 제목", content = "게시글 내용")
+        
+        self.assertEqual(check_is_author(user, user_post.id), True)
+
+    def test_when_fail_in_check_is_author(self):
+        """
+        로그인 한 유저가 해당 게시글의 작성자인지를 판단하는 함수
+        case : 로그인 한 유저가 게시글의 작성자와 불일치할 경우
+        result : 일치하다는 뜻으로 False 출력
+        """
+        user = UserModel.objects.get(username="ko", email="ko@naver.com")
+        user_post = PostModel.objects.get(user = user, title = "게시글 제목", content = "게시글 내용")
+        not_author = UserModel.objects.create(username="not_author", email="not_author@naver.com")
+        
+        self.assertEqual(check_is_author(not_author, user_post.id), False)
