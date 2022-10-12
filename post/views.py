@@ -1,8 +1,12 @@
+from email.policy import HTTP
+from http.client import HTTPResponse
 from rest_framework import status, permissions, exceptions
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
+
+from django.shortcuts import render, redirect
 
 from .models import Post as PostModel
 from .services.post_service import(
@@ -70,7 +74,7 @@ class PostView(APIView):
                 return Response({"detail" : "수정할 게시글이 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
         return Response({"detail" : "게시글의 수정은 작성자만이 할 수 있습니다."}, status=status.HTTP_403_FORBIDDEN)
 
-    def delete(slef, request: Request, post_id: int)-> Response:
+    def delete(self, request: Request, post_id: int)-> Response:
         if check_is_author(request.user, post_id):
             try:
                 delete_post(post_id)
@@ -86,7 +90,10 @@ class RecoverPostView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
 
-    def put(slef, request: Request, post_id: int):
+    def get(self, request):
+        return redirect("/admin")
+
+    def put(self, request: Request, post_id: int):
         if check_post_is_active(post_id):
             return Response({"detail" : "게시글이 활성화가 되어있는 상태입니다."}, status=status.HTTP_400_BAD_REQUEST)
         try: 
