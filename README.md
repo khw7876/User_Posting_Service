@@ -16,7 +16,11 @@
 ## 🎇배포 이미지
 ![image](https://user-images.githubusercontent.com/101394490/194736513-1731b5d0-592d-4c76-9f10-448c7e409d5f.png)
 
+### DataBase
+- PSQL을 이용한 postgreSQL 사용
 
+### ServiceLayer
+- 비즈니스 로직을 분리하여 MTV패턴의 각 역할만이 가능하도록 구현
 
 ## 📌 컨벤션
 
